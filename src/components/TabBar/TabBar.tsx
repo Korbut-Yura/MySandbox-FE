@@ -1,14 +1,11 @@
 import React, {useEffect} from 'react';
 
-import {
-  BottomTabBarProps,
-  BottomTabNavigationOptions,
-} from '@react-navigation/bottom-tabs';
+import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import {View, StyleSheet, Dimensions} from 'react-native';
 import Animated, {
+  interpolateColor,
   useAnimatedProps,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withSequence,
   withSpring,
@@ -17,6 +14,8 @@ import Animated, {
 import {Tab} from './Tab';
 import Svg, {Path} from 'react-native-svg';
 import {HOME, LIST, SALES, BOOKING, SETTINGS} from 'navigation';
+import {useAnimatedThemeColors, useThemeProgress} from 'hooks';
+import {themes, THEMES} from 'contexts';
 
 const TAB_BAR_HEIGHT = 70;
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -59,22 +58,37 @@ export const TabBar: React.FC<BottomTabBarProps> = ({
     };
   });
 
+  const themeProgress = useThemeProgress();
+
   const animatedProps = useAnimatedProps(() => {
     const path = `M0,0 C${rippleX.value},${rippleY.value} ${rippleX.value},${rippleY.value} ${SCREEN_WIDTH},0 V${SCREEN_WIDTH},${TAB_BAR_HEIGHT} H0,0  Z`;
     return {
       d: path,
+      fill: interpolateColor(
+        themeProgress.value,
+        [0, 1],
+        [
+          themes[THEMES.LIGHT].background_main,
+          themes[THEMES.DARK].background_main,
+        ],
+      ),
     };
   }, [rippleX, rippleY, SECTION_WIDTH]);
+
+  const rActiveTabStyle = useAnimatedThemeColors({
+    backgroundColor: 'background_light',
+  });
 
   return (
     <View>
       <Svg style={styles.rippleSVG}>
-        <AnimatedPath fill={'#fff'} animatedProps={animatedProps} />
+        <AnimatedPath animatedProps={animatedProps} />
       </Svg>
       <View style={styles.container}>
         <Animated.View
           style={[
             styles.activeTab,
+            rActiveTabStyle,
             {
               height: SECTION_WIDTH,
               width: SECTION_WIDTH,
@@ -125,7 +139,6 @@ export const TabBar: React.FC<BottomTabBarProps> = ({
               onPress={onPress}
               onLongPress={onLongPress}
               index={index}
-              options={options as Required<BottomTabNavigationOptions>}
               iconName={ICON_NAMES[route.name]}
             />
           );
@@ -141,7 +154,6 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     position: 'absolute',
-    backgroundColor: '#fff',
     bottom: 4,
     shadowColor: '#000',
     shadowOffset: {

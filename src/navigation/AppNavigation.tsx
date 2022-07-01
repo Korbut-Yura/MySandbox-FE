@@ -7,7 +7,11 @@ import {Settings} from 'screens';
 import {HOME, LIST, SALES, BOOKING, SETTINGS} from './AppNavigation.consts';
 import {Screen, TabBar} from 'components';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
+import Animated from 'react-native-reanimated';
+import {useAnimatedThemeColors} from 'hooks';
+import {useTheme} from 'contexts';
 
+const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
 export type RootStackParamList = {
   [HOME]: undefined;
   [LIST]: undefined;
@@ -20,19 +24,25 @@ const Tab = createBottomTabNavigator<RootStackParamList>();
 
 export const AppNavigation: React.FC = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const rStyle = useAnimatedThemeColors({backgroundColor: 'background_main'});
 
+  const {palette} = useTheme();
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{flex: 1}} edges={['right', 'bottom', 'left']}>
+      <AnimatedSafeAreaView
+        style={[{flex: 1}, rStyle]}
+        edges={['right', 'bottom', 'left']}>
         <NavigationContainer>
           <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
           <Tab.Navigator
             initialRouteName={HOME}
-            tabBar={props => <TabBar {...props} />}
             screenOptions={{
-              tabBarActiveTintColor: '#673ab7',
-              tabBarInactiveTintColor: '#BFCCE4',
-            }}>
+              headerTintColor: palette.foreground_main,
+              headerBackground: () => (
+                <Animated.View style={[{flex: 1}, rStyle]} />
+              ),
+            }}
+            tabBar={props => <TabBar {...props} />}>
             <Tab.Screen name={HOME} component={Screen} />
             <Tab.Screen name={LIST} component={Screen} />
             <Tab.Screen name={SALES} component={Screen} />
@@ -40,7 +50,7 @@ export const AppNavigation: React.FC = () => {
             <Tab.Screen name={SETTINGS} component={Settings} />
           </Tab.Navigator>
         </NavigationContainer>
-      </SafeAreaView>
+      </AnimatedSafeAreaView>
     </SafeAreaProvider>
   );
 };

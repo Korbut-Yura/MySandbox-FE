@@ -2,6 +2,6 @@ export {
   themes,
   ThemeContext,
   ThemeContextProvider,
+  useTheme,
   THEMES,
-  COLORS,
 } from './ThemeContext';

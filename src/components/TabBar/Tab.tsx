@@ -1,4 +1,4 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useContext, useLayoutEffect} from 'react';
 import {Pressable, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {BottomTabNavigationOptions} from '@react-navigation/bottom-tabs';
+import {ThemeContext} from 'contexts';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 
@@ -18,7 +19,7 @@ type TabBarButtonProps = {
   onPress: () => void;
   onLongPress: () => void;
   index: number;
-  options: Required<BottomTabNavigationOptions>;
+  options?: BottomTabNavigationOptions;
   iconName: string;
 };
 
@@ -29,12 +30,11 @@ export const Tab: React.FC<TabBarButtonProps> = ({
   onPress,
   onLongPress,
   index,
-  options,
   iconName,
 }) => {
   const isFocused = selectedTab === index;
-  const {tabBarActiveTintColor, tabBarInactiveTintColor} = options;
   const animatedValue = useSharedValue(0);
+  const {palette} = useContext(ThemeContext);
 
   useLayoutEffect(() => {
     animatedValue.value = withTiming(isFocused ? 1 : 0);
@@ -46,7 +46,7 @@ export const Tab: React.FC<TabBarButtonProps> = ({
       color: interpolateColor(
         animatedValue.value,
         [0, 1],
-        [tabBarInactiveTintColor, tabBarActiveTintColor],
+        [palette.inactive, palette.primary_light],
       ),
     };
   });
@@ -54,7 +54,7 @@ export const Tab: React.FC<TabBarButtonProps> = ({
   const rTextStyle = useAnimatedStyle(() => ({
     opacity: animatedValue.value,
     bottom: animatedValue.value * OFFSET,
-    color: tabBarActiveTintColor,
+    color: palette.primary_light,
   }));
 
   return (
