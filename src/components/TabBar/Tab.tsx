@@ -71,6 +71,7 @@ export const Tab: React.FC<TabBarButtonProps> = ({
 
 const styles = StyleSheet.create({
   tab: {
+    zIndex: 1,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

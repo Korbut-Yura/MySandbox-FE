@@ -9,6 +9,8 @@ module.exports = {
           screens: './src/screens',
           components: './src/components',
           navigation: './src/navigation',
+          contexts: './src/contexts',
+          hooks: './src/hooks',
         },
       },
     ],

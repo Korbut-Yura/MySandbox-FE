@@ -16,14 +16,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import {Tab} from './Tab';
 import Svg, {Path} from 'react-native-svg';
-import {HOME, RESTOURANS, SALES, BOOKING, SETTINGS} from 'navigation';
+import {HOME, LIST, SALES, BOOKING, SETTINGS} from 'navigation';
 
 const TAB_BAR_HEIGHT = 70;
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const ICON_NAMES: {[screen: string]: string} = {
   [HOME]: 'home-outline',
-  [RESTOURANS]: 'restaurant-outline',
+  [LIST]: 'restaurant-outline',
   [SALES]: 'pricetags-outline',
   [BOOKING]: 'today-outline',
   [SETTINGS]: 'settings-outline',
@@ -35,24 +35,18 @@ export const TabBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const selectedTab = state.index;
-  const scale = useSharedValue(1);
   const SECTION_WIDTH = SCREEN_WIDTH / state.routes.length;
+  const scale = useSharedValue(1);
+  const translateX = useSharedValue(SECTION_WIDTH * state.index);
+  const rippleX = useSharedValue(SECTION_WIDTH / 2);
+  const rippleY = useSharedValue(0);
 
   useEffect(() => {
     scale.value = withSequence(withTiming(0.3, {duration: 200}), withTiming(1));
-  }, [selectedTab, scale]);
-
-  const translateX = useDerivedValue(() => {
-    return withTiming(SECTION_WIDTH * state.index);
-  }, [state.index, selectedTab, SECTION_WIDTH]);
-
-  const rippleX = useDerivedValue(() => {
-    return withSpring(SECTION_WIDTH * state.index + SECTION_WIDTH / 2);
-  }, [state.index, SECTION_WIDTH]);
-
-  const rippleY = useDerivedValue(() => {
-    return withSequence(withTiming(20), withSpring(0));
-  }, [state.index]);
+    translateX.value = withTiming(SECTION_WIDTH * selectedTab);
+    rippleX.value = withSpring(SECTION_WIDTH * selectedTab + SECTION_WIDTH / 2);
+    rippleY.value = withSequence(withTiming(20), withSpring(0));
+  }, [selectedTab, rippleY, scale, translateX, rippleX, SECTION_WIDTH]);
 
   const rStyle = useAnimatedStyle(() => {
     return {
@@ -91,7 +85,6 @@ export const TabBar: React.FC<BottomTabBarProps> = ({
         />
         {state.routes.map((route, index) => {
           const {options} = descriptors[route.key];
-          console.log(route, options);
           const label =
             options.tabBarLabel !== undefined
               ? options.tabBarLabel
@@ -149,7 +142,7 @@ const styles = StyleSheet.create({
   activeTab: {
     position: 'absolute',
     backgroundColor: '#fff',
-    bottom: 0,
+    bottom: 4,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -157,6 +150,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 10,
+    elevation: 4,
   },
   rippleSVG: {
     position: 'absolute',

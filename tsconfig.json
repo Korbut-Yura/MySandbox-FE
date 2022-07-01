@@ -42,6 +42,8 @@
       "screens": ["src/screens/index", "src/screens/*"],
       "components": ["src/components/index", "src/components/*"],
       "navigation": ["src/navigation/index", "src/navigation/*"],
+      "contexts": ["src/contexts/index", "src/contexts/*"],
+      "hooks": ["src/hooks/index", "src/hooks/*"],
     },                                        /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
